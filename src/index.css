@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: url('/background.png') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Glass morphism utility classes */
+.glass {
+  @apply bg-black/20 backdrop-blur-xl border border-white/10;
+}
+
+.glass-hover {
+  @apply hover:bg-white/5 transition-colors;
+}
+
+/* Chart customization */
+.chartjs-tooltip {
+  @apply bg-black/80 backdrop-blur-sm border border-white/10 !important;
+}
+
+/* Make calendar and time input icons white */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.8;
+}
+
+/* Custom scrollbar for horizontal scrolling */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-white\/10 {
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.scrollbar-track-transparent {
+  scrollbar-track-color: transparent;
+}
+
+/* Firefox specific styles */
+@-moz-document url-prefix() {
+  input[type="date"],
+  input[type="time"] {
+    position: relative;
+  }
+
+  input[type="date"]::-moz-calendar-picker-indicator,
+  input[type="time"]::-moz-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.5;
+  }
+
+  input[type="date"]::-moz-calendar-picker-indicator:hover,
+  input[type="time"]::-moz-calendar-picker-indicator:hover {
+    opacity: 0.8;
+  }
+}
+
+/* Autofill override for all input fields */
+input, input:-webkit-autofill, input:-webkit-autofill:focus, input:-webkit-autofill:hover, input:-webkit-autofill:active {
+  background: rgba(255,255,255,0.10) !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(255,255,255,0.10) inset !important;
+  box-shadow: 0 0 0 1000px rgba(255,255,255,0.10) inset !important;
+  -webkit-text-fill-color: #fff !important;
+  color: #fff !important;
+  border: none !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* Specific override for chat input */
+.chat-input, .chat-input:-webkit-autofill, .chat-input:-webkit-autofill:focus, .chat-input:-webkit-autofill:hover, .chat-input:-webkit-autofill:active {
+  background: none !important;
+  background-color: rgba(0, 0, 0, 0) !important;
+  background-image: none !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0) inset !important;
+  box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0) inset !important;
+  -webkit-text-fill-color: #fff !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Even more specific override using ID */
+#chat-message-input, #chat-message-input:-webkit-autofill, #chat-message-input:-webkit-autofill:focus, #chat-message-input:-webkit-autofill:hover, #chat-message-input:-webkit-autofill:active {
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+  -webkit-text-fill-color: #fff !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-transition: none !important;
+  transition: none !important;
+}
