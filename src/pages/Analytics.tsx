@@ -119,77 +119,79 @@ function Analytics() {
   const overallCompletionRate = totalPossible > 0 ? Math.round((totalCompletions / totalPossible) * 100) : 0;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-center" style={{
-          color: '#FFF',
-          fontFamily: 'Poppins',
-          fontSize: '22px',
-          fontStyle: 'normal',
-          fontWeight: '500',
-          lineHeight: '19px'
-        }}>Analytics</h1>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Weekly Progress */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Weekly Progress</h2>
-          <Line
-            data={progressData}
-            options={{
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  max: 100,
-                  ticks: {
-                    callback: (value) => `${value}%`,
-                  },
-                },
-              },
-              plugins: {
-                tooltip: {
-                  callbacks: {
-                    label: (context) => `Completion Rate: ${Math.round(context.parsed.y)}%`,
-                  },
-                },
-              },
-            }}
-          />
+    <div className="w-full h-full flex flex-col" style={{ height: '780px' }}>
+      <div className="pl-0 pr-0 pt-4 pb-4 space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-center" style={{
+            color: '#FFF',
+            fontFamily: 'Poppins',
+            fontSize: '22px',
+            fontStyle: 'normal',
+            fontWeight: '500',
+            lineHeight: '19px'
+          }}>Analytics</h1>
         </div>
 
-        {/* Monthly Overview */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Monthly Overview</h2>
-          <Bar
-            data={monthlyData}
-            options={{
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: true,
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Weekly Progress */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Weekly Progress</h2>
+            <Line
+              data={progressData}
+              options={{
+                responsive: true,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                      callback: (value) => `${value}%`,
+                    },
+                  },
                 },
-              },
-            }}
-          />
-        </div>
+                plugins: {
+                  tooltip: {
+                    callbacks: {
+                      label: (context) => `Completion Rate: ${Math.round(context.parsed.y)}%`,
+                    },
+                  },
+                },
+              }}
+            />
+          </div>
 
-        {/* Statistics Summary */}
-        <div className="bg-white rounded-lg shadow p-6 lg:col-span-2">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Statistics Summary</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-500">Total Goals</h3>
-              <p className="mt-2 text-2xl font-bold text-indigo-600">{goals.length}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-500">Completions</h3>
-              <p className="mt-2 text-2xl font-bold text-indigo-600">{totalCompletions}</p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-500">Overall Rate</h3>
-              <p className="mt-2 text-2xl font-bold text-indigo-600">{overallCompletionRate}%</p>
+          {/* Monthly Overview */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Monthly Overview</h2>
+            <Bar
+              data={monthlyData}
+              options={{
+                responsive: true,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }}
+            />
+          </div>
+
+          {/* Statistics Summary */}
+          <div className="bg-white rounded-lg shadow p-6 lg:col-span-2">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">Statistics Summary</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-500">Total Goals</h3>
+                <p className="mt-2 text-2xl font-bold text-indigo-600">{goals.length}</p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-500">Completions</h3>
+                <p className="mt-2 text-2xl font-bold text-indigo-600">{totalCompletions}</p>
+              </div>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-500">Overall Rate</h3>
+                <p className="mt-2 text-2xl font-bold text-indigo-600">{overallCompletionRate}%</p>
+              </div>
             </div>
           </div>
         </div>

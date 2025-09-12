@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 import { format, isBefore, parseISO } from 'date-fns';
-import { getConnectionStatus } from '../lib/supabase';
 
 interface Goal {
   id: string;
@@ -83,10 +82,6 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
   fetchGoals: async () => {
     try {
-      if (!getConnectionStatus()) {
-        throw new Error('Database connection is not ready');
-      }
-
       set({ loading: true, error: null });
       
       const { data: user } = await supabase.auth.getUser();
@@ -123,10 +118,6 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
   addGoal: async (goal) => {
     try {
-      if (!getConnectionStatus()) {
-        throw new Error('Database connection is not ready');
-      }
-
       set({ error: null });
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) {
@@ -158,10 +149,6 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
   updateGoal: async (goal) => {
     try {
-      if (!getConnectionStatus()) {
-        throw new Error('Database connection is not ready');
-      }
-
       set({ error: null });
       
       const updateOperation = async () => {
@@ -198,10 +185,6 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
   deleteGoal: async (id) => {
     try {
-      if (!getConnectionStatus()) {
-        throw new Error('Database connection is not ready');
-      }
-
       set({ error: null });
       
       const deleteOperation = async () => {
@@ -227,10 +210,6 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
   toggleGoalCompletion: async (goalId: string, date: string) => {
     try {
-      if (!getConnectionStatus()) {
-        throw new Error('Database connection is not ready');
-      }
-
       set({ error: null });
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) {
@@ -296,10 +275,6 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
   markGoalMissed: async (goalId: string, date: string, reason: string, improvement_plan: string) => {
     try {
-      if (!getConnectionStatus()) {
-        throw new Error('Database connection is not ready');
-      }
-
       set({ error: null });
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) {
@@ -378,10 +353,6 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
   fetchCompletions: async (startDate: string, endDate: string) => {
     try {
-      if (!getConnectionStatus()) {
-        throw new Error('Database connection is not ready');
-      }
-
       set({ error: null });
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) {
@@ -417,10 +388,6 @@ export const useGoalStore = create<GoalStore>((set, get) => ({
 
   fetchMisses: async (startDate: string, endDate: string) => {
     try {
-      if (!getConnectionStatus()) {
-        throw new Error('Database connection is not ready');
-      }
-
       set({ error: null });
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) {

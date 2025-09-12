@@ -48,33 +48,46 @@ function App() {
     }
   }, [user, fetchGoals, fetchCompletions, fetchMisses, fetchMonthMoods, fetchTodaysMood]);
 
-  if (!user) {
-    return (
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </Router>
-    );
-  }
-
-  return (
+  const appContent = (
     <Router>
       <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="goals" element={<Goals />} />
-          <Route path="calendar" element={<Calendar />} />
-          <Route path="progress" element={<Progress />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="daily-planner" element={<DailyPlanner />} />
-          <Route path="ai-chat" element={<AIChat />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        {!user ? (
+          <>
+            <Route path="/login" element={<Login />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </>
+        ) : (
+          <>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="goals" element={<Goals />} />
+              <Route path="calendar" element={<Calendar />} />
+              <Route path="progress" element={<Progress />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="daily-planner" element={<DailyPlanner />} />
+              <Route path="ai-chat" element={<AIChat />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </>
+        )}
       </Routes>
     </Router>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div 
+        className="bg-white rounded-3xl shadow-2xl overflow-hidden"
+        style={{
+          width: '410px',
+          height: '780px',
+          border: '2px solid #d1d5db'
+        }}
+      >
+        {appContent}
+      </div>
+    </div>
   );
 }
 

@@ -495,208 +495,217 @@ function CalendarPage() {
   }
 
   return (
-    <div className="p-4 space-y-6">
-      {/* Header */}
-      <div className="flex items-center mb-6">
-        <h1 className="text-center mr-4" style={{
-          color: '#FFF',
-          textAlign: 'center',
-          fontFamily: 'Poppins',
-          fontSize: '22px',
-          fontStyle: 'normal',
-          fontWeight: 500,
-          lineHeight: '19px'
-        }}>Calendar</h1>
-        <div className="flex-1 border-t" style={{ borderColor: 'rgba(255, 146, 138, 0.3)' }} />
-      </div>
-      <div className="flex flex-col space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <h1 className="text-center" style={{
-              color: '#FFF',
-              fontFamily: 'Poppins',
-              fontSize: '22px',
-              fontStyle: 'normal',
-              fontWeight: '500',
-              lineHeight: '19px'
-            }}>
-              {format(currentMonth, view === 'month' ? 'MMMM yyyy' : "'Week of' MMM d, yyyy")}
-            </h1>
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={handlePreviousMonth}
-                className="p-1 hover:bg-white/5 rounded-full text-white transition-colors"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button 
-                onClick={handleNextMonth}
-                className="p-1 hover:bg-white/5 rounded-full text-white transition-colors"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-
+    <div className="w-full h-full flex flex-col" style={{ 
+      height: '780px',
+      backgroundImage: 'url(/background.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }}>
+      {/* Content area - scrollable */}
+      <div className="flex-1 overflow-y-auto transition-all duration-300 ease-in-out">
+        {/* Header */}
+        <div className="flex items-center mb-6">
+          <h1 className="text-center mr-4" style={{
+            color: '#FFF',
+            textAlign: 'center',
+            fontFamily: 'Poppins',
+            fontSize: '22px',
+            fontStyle: 'normal',
+            fontWeight: 500,
+            lineHeight: '19px'
+          }}>Calendar</h1>
+          <div className="flex-1 border-t" style={{ borderColor: 'rgba(255, 146, 138, 0.3)' }} />
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => handleViewChange('month')}
-              className={`flex items-center justify-center transition-colors
-                ${view === 'month' ? 'bg-[#3E3EF4] text-white' : 'border border-white/20 bg-black/40 text-white hover:bg-white/10'}
-              `}
-              style={{
-                height: '36px',
-                padding: '0 24px',
-                borderRadius: '35px',
-                minWidth: '100px',
+        <div className="flex flex-col space-y-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <h1 className="text-center" style={{
                 color: '#FFF',
                 fontFamily: 'Poppins',
-                fontSize: '14.944px',
+                fontSize: '22px',
                 fontStyle: 'normal',
                 fontWeight: '500',
-                lineHeight: '25.493px',
-                letterSpacing: '-0.448px'
-              }}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => handleViewChange('week')}
-              className={`flex items-center justify-center transition-colors
-                ${view === 'week' ? 'bg-[#3E3EF4] text-white' : 'border border-white/20 bg-black/40 text-white hover:bg-white/10'}
-              `}
-              style={{
-                height: '36px',
-                padding: '0 24px',
-                borderRadius: '35px',
-                minWidth: '100px',
-                color: '#FFF',
-                fontFamily: 'Poppins',
-                fontSize: '14.944px',
-                fontStyle: 'normal',
-                fontWeight: '500',
-                lineHeight: '25.493px',
-                letterSpacing: '-0.448px'
-              }}
-            >
-              Weekly
-            </button>
-          </div>
-          <button
-            onClick={() => setShowExportDropdown(!showExportDropdown)}
-            className="flex items-center justify-center transition-colors border border-white/20 bg-black/40 text-white hover:bg-white/10"
-            style={{
-              height: '36px',
-              padding: '0 24px',
-              borderRadius: '35px',
-              minWidth: '100px',
-              color: '#FFF',
-              fontFamily: 'Poppins',
-              fontSize: '14.944px',
-              fontStyle: 'normal',
-              fontWeight: '500',
-              lineHeight: '25.493px',
-              letterSpacing: '-0.448px'
-            }}
-          >
-            Export
-          </button>
-        </div>
-      </div>
-      <div className="rounded-xl">
-        <div className="p-2 md:p-6">
-          <div className="grid grid-cols-7 mb-1 md:mb-4">
-            {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day) => (
-              <div key={day} className="text-center text-xs md:text-sm font-medium text-gray-400 py-1">
-                {day}
-              </div>
-            ))}
-          </div>
-          <div className={`grid grid-cols-7 gap-0.5 md:gap-2 ${view === 'week' ? 'h-[600px]' : ''}`}>
-            {view === 'month' && Array.from({ length: dateInfo.firstDayOffset }).map((_, i) => (
-              <div key={`empty-${i}`} className="md:aspect-square" />
-            ))}
-            {dateInfo.daysInView.map((date) => (
-              <DayCell
-                key={format(date, 'yyyy-MM-dd')}
-                date={date}
-                goals={goals}
-                completions={completions}
-                misses={misses}
-                view={view}
-                selectedDate={selectedDate}
-                expandedDates={expandedDates}
-                onGoalAction={handleGoalAction}
-                onToggleExpansion={toggleDateExpansion}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {showMissForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-lg shadow-xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium text-white mb-4">Why did you miss this goal?</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-white">Reason</label>
-                <textarea
-                  value={missFormData.reason}
-                  onChange={(e) => setMissFormData({ ...missFormData, reason: e.target.value })}
-                  className="mt-1 block w-full rounded-md bg-black/20 border-white/10 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={3}
-                  placeholder="What prevented you from completing this goal?"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-white">How will you improve?</label>
-                <textarea
-                  value={missFormData.improvement_plan}
-                  onChange={(e) => setMissFormData({ ...missFormData, improvement_plan: e.target.value })}
-                  className="mt-1 block w-full rounded-md bg-black/20 border-white/10 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500"
-                  rows={3}
-                  placeholder="What's your plan to succeed next time?"
-                />
-              </div>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowMissForm(false)}
-                  className="px-4 py-2 border border-white/10 rounded-md shadow-sm text-white hover:bg-white/5"
-                  style={{
-                    color: '#FFF',
-                    fontFamily: 'Poppins',
-                    fontSize: '14.944px',
-                    fontStyle: 'normal',
-                    fontWeight: '500',
-                    lineHeight: '25.493px',
-                    letterSpacing: '-0.448px'
-                  }}
+                lineHeight: '19px'
+              }}>
+                {format(currentMonth, view === 'month' ? 'MMMM yyyy' : "'Week of' M.d.yyyy")}
+              </h1>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handlePreviousMonth}
+                  className="p-1 hover:bg-white/5 rounded-full text-white transition-colors"
                 >
-                  Cancel
+                  <ChevronLeft className="h-5 w-5" />
                 </button>
-                <button
-                  onClick={handleMissSubmit}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                  style={{
-                    color: '#FFF',
-                    fontFamily: 'Poppins',
-                    fontSize: '14.944px',
-                    fontStyle: 'normal',
-                    fontWeight: '500',
-                    lineHeight: '25.493px',
-                    letterSpacing: '-0.448px'
-                  }}
+                <button 
+                  onClick={handleNextMonth}
+                  className="p-1 hover:bg-white/5 rounded-full text-white transition-colors"
                 >
-                  Submit
+                  <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
             </div>
+
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => handleViewChange('month')}
+                className={`flex items-center justify-center transition-colors
+                  ${view === 'month' ? 'bg-[#3E3EF4] text-white' : 'border border-white/20 bg-black/40 text-white hover:bg-white/10'}
+                `}
+                            style={{
+                  height: '36px',
+                  padding: '0 16px',
+                  borderRadius: '35px',
+                  minWidth: '80px',
+                  color: '#FFF',
+                  fontFamily: 'Poppins',
+                  fontSize: '14.944px',
+                  fontStyle: 'normal',
+                  fontWeight: '500',
+                  lineHeight: '25.493px',
+                  letterSpacing: '-0.448px'
+                }}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => handleViewChange('week')}
+                className={`flex items-center justify-center transition-colors
+                  ${view === 'week' ? 'bg-[#3E3EF4] text-white' : 'border border-white/20 bg-black/40 text-white hover:bg-white/10'}
+                `}
+                style={{
+                  height: '36px',
+                  padding: '0 16px',
+                  borderRadius: '35px',
+                  minWidth: '80px',
+                  color: '#FFF',
+                  fontFamily: 'Poppins',
+                  fontSize: '14.944px',
+                  fontStyle: 'normal',
+                  fontWeight: '500',
+                  lineHeight: '25.493px',
+                  letterSpacing: '-0.448px'
+                }}
+              >
+                Weekly
+              </button>
+            </div>
+            <button
+              onClick={() => setShowExportDropdown(!showExportDropdown)}
+              className="flex items-center justify-center transition-colors border border-white/20 bg-black/40 text-white hover:bg-white/10"
+                            style={{
+                  height: '36px',
+                  padding: '0 16px',
+                  borderRadius: '35px',
+                  minWidth: '80px',
+                  color: '#FFF',
+                  fontFamily: 'Poppins',
+                  fontSize: '14.944px',
+                  fontStyle: 'normal',
+                  fontWeight: '500',
+                  lineHeight: '25.493px',
+                  letterSpacing: '-0.448px'
+                }}
+            >
+              Export
+            </button>
           </div>
         </div>
-      )}
+        <div className="rounded-xl">
+          <div className="p-2 md:p-6">
+            <div className="grid grid-cols-7 mb-1 md:mb-4">
+              {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day) => (
+                <div key={day} className="text-center text-xs md:text-sm font-medium text-gray-400 py-1">
+                  {day}
+                </div>
+              ))}
+            </div>
+            <div className={`grid grid-cols-7 gap-0.5 md:gap-2 ${view === 'week' ? 'h-[600px]' : 'min-h-[400px]'}`}>
+              {view === 'month' && Array.from({ length: dateInfo.firstDayOffset }).map((_, i) => (
+                <div key={`empty-${i}`} className="md:aspect-square" />
+              ))}
+              {dateInfo.daysInView.map((date) => (
+                <DayCell
+                  key={format(date, 'yyyy-MM-dd')}
+                  date={date}
+                  goals={goals}
+                  completions={completions}
+                  misses={misses}
+                  view={view}
+                  selectedDate={selectedDate}
+                  expandedDates={expandedDates}
+                  onGoalAction={handleGoalAction}
+                  onToggleExpansion={toggleDateExpansion}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {showMissForm && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-lg shadow-xl p-6 max-w-md w-full">
+              <h3 className="text-lg font-medium text-white mb-4">Why did you miss this goal?</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-white">Reason</label>
+                  <textarea
+                    value={missFormData.reason}
+                    onChange={(e) => setMissFormData({ ...missFormData, reason: e.target.value })}
+                    className="mt-1 block w-full rounded-md bg-black/20 border-white/10 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500"
+                    rows={3}
+                    placeholder="What prevented you from completing this goal?"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-white">How will you improve?</label>
+                  <textarea
+                    value={missFormData.improvement_plan}
+                    onChange={(e) => setMissFormData({ ...missFormData, improvement_plan: e.target.value })}
+                    className="mt-1 block w-full rounded-md bg-black/20 border-white/10 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500"
+                    rows={3}
+                    placeholder="What's your plan to succeed next time?"
+                  />
+                </div>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowMissForm(false)}
+                    className="px-4 py-2 border border-white/10 rounded-md shadow-sm text-white hover:bg-white/5"
+                    style={{
+                      color: '#FFF',
+                      fontFamily: 'Poppins',
+                      fontSize: '14.944px',
+                      fontStyle: 'normal',
+                      fontWeight: '500',
+                      lineHeight: '25.493px',
+                      letterSpacing: '-0.448px'
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleMissSubmit}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                    style={{
+                      color: '#FFF',
+                      fontFamily: 'Poppins',
+                      fontSize: '14.944px',
+                      fontStyle: 'normal',
+                      fontWeight: '500',
+                      lineHeight: '25.493px',
+                      letterSpacing: '-0.448px'
+                    }}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

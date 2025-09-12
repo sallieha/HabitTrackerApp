@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Lightbulb, Target, Calendar, TrendingUp } from 'lucide-react';
+import { Send, User, Lightbulb, Target, Calendar, TrendingUp, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
 interface Message {
@@ -12,7 +12,7 @@ interface Message {
 const suggestedPrompts = [
   {
     icon: Target,
-    text: "Help me create a new habit",
+    text: "Help me create new habits",
     prompt: "I want to create a new habit. Can you help me set realistic goals and frequency?"
   },
   {
@@ -212,106 +212,192 @@ function AIChat() {
     handleSendMessage('I want to enter my goals manually.');
   };
 
+  const handleClearChat = () => {
+    setMessages([]);
+    setShowChat(false);
+    setInputValue('');
+    setIsTyping(false);
+    
+    // Clear localStorage
+    try {
+      localStorage.removeItem('aiChatMessages');
+      localStorage.removeItem('aiChatShowChat');
+    } catch (error) {
+      console.error('Failed to clear chat history from localStorage:', error);
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full min-h-[600px] max-w-md mx-auto px-2 py-6">
-      {/* Initial AI message - always shown at top */}
-      <div className="flex items-start gap-3 mb-6">
-        <div
-          className="h-8 w-8 rounded-full shadow-lg flex items-center justify-center mt-1"
-          style={{ background: 'linear-gradient(180deg, #FF928A 0%, #0A2861 100%)' }}
-        />
-        <div className="bg-black/40 text-white rounded-xl px-4 py-3 text-base font-medium shadow border border-white/10 max-w-[80%]" style={{ color: '#FFF', fontFamily: 'Poppins', fontSize: '16px', fontStyle: 'normal', fontWeight: '400', lineHeight: '23.88px' }}>
-          What goals would you like to set today?
+    <div className="w-full h-full flex flex-col" style={{ 
+      height: '780px',
+      backgroundImage: 'url(/background.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat'
+    }}>
+      {/* Content area - scrollable */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Initial AI message - always shown at top */}
+        <div className="flex items-start gap-3 mb-6">
+          <div
+            className="h-8 w-8 rounded-full shadow-lg flex items-center justify-center mt-1"
+            style={{ background: 'linear-gradient(180deg, #FF928A 0%, #0A2861 100%)' }}
+          />
+          <div className="bg-black/40 text-white rounded-xl px-4 py-3 text-base font-medium shadow border border-white/10 max-w-[80%]" style={{ color: '#FFF', fontFamily: 'Poppins', fontSize: '16px', fontStyle: 'normal', fontWeight: '400', lineHeight: '23.88px' }}>
+            What goals would you like to set today?
+          </div>
+        </div>
+
+        {/* Action buttons - always visible */}
+        <div className="flex gap-3 mb-6">
+          <button
+            onClick={handleAddNew}
+            className="px-4 py-1.5 rounded-full bg-[#3E3EF4] hover:bg-[#3535d6] text-white shadow transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            style={{
+              color: '#FFF',
+              fontFamily: 'Poppins',
+              fontSize: '14.944px',
+              fontStyle: 'normal',
+              fontWeight: '500',
+              lineHeight: '25.493px',
+              letterSpacing: '-0.448px'
+            }}
+          >
+            Add New
+          </button>
+          <button
+            onClick={handleEnterManually}
+            className="px-4 py-1.5 rounded-full border border-white/20 bg-black/40 text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            style={{
+              color: '#FFF',
+              fontFamily: 'Poppins',
+              fontSize: '14.944px',
+              fontStyle: 'normal',
+              fontWeight: '500',
+              lineHeight: '25.493px',
+              letterSpacing: '-0.448px'
+            }}
+          >
+            Enter Manually
+          </button>
+        </div>
+
+        {/* Try asking me about section - always visible */}
+        <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
+          <div className="mb-3" style={{
+            color: '#FFF',
+            fontFamily: 'Poppins',
+            fontSize: '14px',
+            fontStyle: 'normal',
+            fontWeight: '400',
+            lineHeight: '23.88px'
+          }}>Try asking me about:</div>
+          <div className="flex flex-col gap-3">
+          {suggestedPrompts.map((prompt, index) => {
+            const Icon = prompt.icon;
+            return (
+              <button
+                key={index}
+                onClick={() => handleSuggestedPrompt(prompt.prompt)}
+                  className="flex items-center gap-3 px-4 py-3 bg-black/30 hover:bg-indigo-500/10 rounded-xl border border-white/10 transition-colors text-left"
+                  style={{
+                    color: '#FFF',
+                    fontFamily: 'Poppins',
+                    fontSize: '14.944px',
+                    fontStyle: 'normal',
+                    fontWeight: '500',
+                    lineHeight: '25.493px',
+                    letterSpacing: '-0.448px'
+                  }}
+                >
+                  <Icon className="h-5 w-5 text-indigo-300 flex-shrink-0" />
+                  <span className="text-white" style={{
+                    color: '#FFF',
+                    fontFamily: 'Poppins',
+                    fontSize: '14px',
+                    fontStyle: 'normal',
+                    fontWeight: '400',
+                    lineHeight: '23.88px'
+                  }}>{prompt.text}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Action buttons - always visible */}
-      <div className="flex gap-3 mb-6">
-        <button
-          onClick={handleAddNew}
-          className="px-6 py-2 rounded-full bg-[#3E3EF4] hover:bg-[#3535d6] text-white shadow transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          style={{
-            color: '#FFF',
-            fontFamily: 'Poppins',
-            fontSize: '14.944px',
-            fontStyle: 'normal',
-            fontWeight: '500',
-            lineHeight: '25.493px',
-            letterSpacing: '-0.448px'
-          }}
-        >
-          Add New
-        </button>
-        <button
-          onClick={handleEnterManually}
-          className="px-6 py-2 rounded-full border border-white/20 bg-black/40 text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          style={{
-            color: '#FFF',
-            fontFamily: 'Poppins',
-            fontSize: '14.944px',
-            fontStyle: 'normal',
-            fontWeight: '500',
-            lineHeight: '25.493px',
-            letterSpacing: '-0.448px'
-          }}
-        >
-          Enter Manually
-        </button>
-      </div>
-
-      {/* Try asking me about section - always visible */}
-      <div className="bg-white/5 rounded-xl p-4 mb-6 border border-white/10">
-        <div className="mb-3" style={{
-          color: '#FFF',
-          fontFamily: 'Poppins',
-          fontSize: '14px',
-          fontStyle: 'normal',
-          fontWeight: '400',
-          lineHeight: '23.88px'
-        }}>Try asking me about:</div>
-        <div className="flex flex-col gap-3">
-        {suggestedPrompts.map((prompt, index) => {
-          const Icon = prompt.icon;
-          return (
-            <button
-              key={index}
-              onClick={() => handleSuggestedPrompt(prompt.prompt)}
-                className="flex items-center gap-3 px-4 py-3 bg-black/30 hover:bg-indigo-500/10 rounded-xl border border-white/10 transition-colors text-left"
+        {/* Chat area */}
+        {showChat && (
+          <>
+            {/* Clear button */}
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={handleClearChat}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+                title="Clear chat history"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span>Clear Chat</span>
+              </button>
+            </div>
+            
+            <div className="space-y-4 mb-4 pr-2">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex gap-3 ${message.isUser ? 'justify-end' : 'justify-start'}`}
+            >
+              {!message.isUser && (
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="32" 
+                      height="32" 
+                      viewBox="0 0 98 98" 
+                      fill="none"
+                      className="flex-shrink-0"
+                    >
+                      <circle cx="49" cy="49" r="49" fill="url(#paint0_linear_361_5969)"/>
+                      <defs>
+                        <linearGradient id="paint0_linear_361_5969" x1="49" y1="0" x2="49" y2="98" gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#0A2861"/>
+                          <stop offset="1" stop-color="#FF928A"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  )}
+              <div
+                className={`max-w-[80%] p-4 rounded-2xl ${
+                  message.isUser
+                        ? 'bg-[#3E3EF4] text-white rounded-br-md'
+                    : 'text-white rounded-bl-md'
+                }`}
                 style={{
-                  color: '#FFF',
-                  fontFamily: 'Poppins',
-                  fontSize: '14.944px',
-                  fontStyle: 'normal',
-                  fontWeight: '500',
-                  lineHeight: '25.493px',
-                  letterSpacing: '-0.448px'
+                  backgroundColor: message.isUser ? undefined : 'transparent',
+                  border: message.isUser ? undefined : '1px solid rgba(255,255,255,0.1)'
                 }}
               >
-                <Icon className="h-5 w-5 text-indigo-300 flex-shrink-0" />
-                <span className="text-white" style={{
+                <div className="whitespace-pre-wrap" style={{
                   color: '#FFF',
                   fontFamily: 'Poppins',
                   fontSize: '14px',
                   fontStyle: 'normal',
                   fontWeight: '400',
                   lineHeight: '23.88px'
-                }}>{prompt.text}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-
-      {/* Chat area */}
-      {showChat && (
-        <div className="flex flex-col flex-1 min-h-[400px]">
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex gap-3 ${message.isUser ? 'justify-end' : 'justify-start'}`}
-          >
-            {!message.isUser && (
+                }}>
+                  {message.content}
+                </div>
+                <div className={`text-xs mt-2 opacity-70 ${message.isUser ? 'text-indigo-100' : 'text-gray-400'}`}>
+                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
+              </div>
+              {message.isUser && (
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 flex-shrink-0">
+                  <User className="h-4 w-4 text-white" />
+                </div>
+              )}
+            </div>
+          ))}
+          {isTyping && (
+            <div className="flex gap-3 justify-start">
                   <svg 
                     xmlns="http://www.w3.org/2000/svg" 
                     width="32" 
@@ -328,74 +414,24 @@ function AIChat() {
                       </linearGradient>
                     </defs>
                   </svg>
-                )}
-            <div
-              className={`max-w-[80%] p-4 rounded-2xl ${
-                message.isUser
-                      ? 'bg-[#3E3EF4] text-white rounded-br-md'
-                  : 'text-white rounded-bl-md'
-              }`}
-              style={{
-                backgroundColor: message.isUser ? undefined : 'transparent',
-                border: message.isUser ? undefined : '1px solid rgba(255,255,255,0.1)'
-              }}
-            >
-              <div className="whitespace-pre-wrap" style={{
-                color: '#FFF',
-                fontFamily: 'Poppins',
-                fontSize: '14px',
-                fontStyle: 'normal',
-                fontWeight: '400',
-                lineHeight: '23.88px'
-              }}>
-                {message.content}
-              </div>
-              <div className={`text-xs mt-2 opacity-70 ${message.isUser ? 'text-indigo-100' : 'text-gray-400'}`}>
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              <div className="bg-white/10 text-white p-4 rounded-2xl rounded-bl-md">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
               </div>
             </div>
-            {message.isUser && (
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10 flex-shrink-0">
-                <User className="h-4 w-4 text-white" />
-              </div>
-            )}
-          </div>
-        ))}
-        {isTyping && (
-          <div className="flex gap-3 justify-start">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="32" 
-                  height="32" 
-                  viewBox="0 0 98 98" 
-                  fill="none"
-                  className="flex-shrink-0"
-                >
-                  <circle cx="49" cy="49" r="49" fill="url(#paint0_linear_361_5969)"/>
-                  <defs>
-                    <linearGradient id="paint0_linear_361_5969" x1="49" y1="0" x2="49" y2="98" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#0A2861"/>
-                      <stop offset="1" stop-color="#FF928A"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-            <div className="bg-white/10 text-white p-4 rounded-2xl rounded-bl-md">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
-      )}
+          </>
+        )}
+      </div>
 
-      {/* Input bar */}
+      {/* Input bar - fixed at bottom */}
       {showChat && (
-        <div className="mt-auto">
+        <div className="mt-auto pt-4">
           <form
             className="flex gap-3"
             onSubmit={e => {
