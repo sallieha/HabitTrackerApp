@@ -91,7 +91,7 @@ function Layout() {
 
   return (
     <div className="h-full w-full flex flex-col" style={{
-      backgroundImage: 'url(./background.png)',
+      backgroundImage: 'url(/background.png)',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat'
