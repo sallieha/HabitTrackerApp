@@ -44,7 +44,7 @@ function Login() {
 
   return (
     <div className="w-full flex flex-col" style={{ 
-      backgroundImage: 'url(/background.png)',
+      backgroundImage: 'url(./background.png)',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',

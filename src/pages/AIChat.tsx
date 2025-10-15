@@ -230,7 +230,7 @@ function AIChat() {
   return (
     <div className="w-full h-full flex flex-col" style={{ 
       height: '780px',
-      backgroundImage: 'url(/background.png)',
+      backgroundImage: 'url(./background.png)',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat'
