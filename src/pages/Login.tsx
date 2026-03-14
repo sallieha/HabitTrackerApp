@@ -44,10 +44,11 @@ function Login() {
 
   return (
     <div className="w-full flex flex-col" style={{ 
-      backgroundImage: 'url(/background.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
+      background: 'linear-gradient(180deg, #FF928A 0%, #0A2861 100%)',
+      backgroundImage: `url(${import.meta.env.BASE_URL}background.png), linear-gradient(180deg, #FF928A 0%, #0A2861 100%)`,
+      backgroundSize: 'cover, cover',
+      backgroundPosition: 'center, center',
+      backgroundRepeat: 'no-repeat, no-repeat',
       height: '780px', 
       minHeight: '780px' 
     }}>

@@ -91,10 +91,11 @@ function Layout() {
 
   return (
     <div className="h-full w-full flex flex-col" style={{
-      backgroundImage: 'url(/background.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
+      backgroundColor: '#0A2861',
+      backgroundImage: `url(${import.meta.env.BASE_URL}background.png), linear-gradient(180deg, #FF928A 0%, #0A2861 100%)`,
+      backgroundSize: 'cover, cover',
+      backgroundPosition: 'center, center',
+      backgroundRepeat: 'no-repeat, no-repeat'
     }}>
       {/* Main content - scrollable */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">

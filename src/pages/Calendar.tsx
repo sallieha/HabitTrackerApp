@@ -497,10 +497,11 @@ function CalendarPage() {
   return (
     <div className="w-full h-full flex flex-col" style={{ 
       height: '780px',
-      backgroundImage: 'url(/background.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
+      background: 'linear-gradient(180deg, #FF928A 0%, #0A2861 100%)',
+      backgroundImage: `url(${import.meta.env.BASE_URL}background.png), linear-gradient(180deg, #FF928A 0%, #0A2861 100%)`,
+      backgroundSize: 'cover, cover',
+      backgroundPosition: 'center, center',
+      backgroundRepeat: 'no-repeat, no-repeat'
     }}>
       {/* Content area - scrollable */}
       <div className="flex-1 overflow-y-auto transition-all duration-300 ease-in-out">
