@@ -50,7 +50,7 @@ function App() {
   }, [user, fetchGoals, fetchCompletions, fetchMisses, fetchMonthMoods, fetchTodaysMood]);
 
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <Routes>
         {/* Full-width deck route — renders outside the mobile container */}
         <Route path="/deck" element={<Deck />} />
