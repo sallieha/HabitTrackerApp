@@ -3,7 +3,7 @@ import { useGoalStore } from '../stores/goalStore';
 import { useMoodStore } from '../stores/moodStore';
 
 import { format, startOfMonth, endOfMonth, isBefore, isAfter, parseISO, isEqual, isToday as isDateToday, addMonths, subMonths, eachDayOfInterval, startOfWeek, endOfWeek, addDays } from 'date-fns';
-import { CheckCircle2, XCircle, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle2, XCircle, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Search } from 'lucide-react';
 
 // Cache for storing previous data to show instantly
 const dataCache = new Map();
@@ -181,6 +181,12 @@ const DayCell = React.memo(({
 
 DayCell.displayName = 'DayCell';
 
+const STATIC_GOALS = [
+  { id: 'static-cases', title: 'Cases', color: '#FF928A', start_date: '2020-01-01', end_date: null, frequency: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] },
+  { id: 'static-chats', title: 'Chats', color: '#A296FF', start_date: '2020-01-01', end_date: null, frequency: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] },
+  { id: 'static-prep',  title: 'Prep',  color: '#3CC3DF', start_date: '2020-01-01', end_date: null, frequency: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] },
+];
+
 function CalendarPage() {
   const { goals, completions, misses, fetchGoals, fetchCompletions, fetchMisses, toggleGoalCompletion, markGoalMissed } = useGoalStore();
   const { fetchTodaysMood, fetchMonthMoods } = useMoodStore();
@@ -189,6 +195,7 @@ function CalendarPage() {
   const [showExportDropdown, setShowExportDropdown] = useState(false);
   const [missFormData, setMissFormData] = useState({ goalId: '', reason: '', improvement_plan: '' });
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
+  const [selectedWeekDay, setSelectedWeekDay] = useState<Date>(() => new Date());
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [loading, setLoading] = useState(false); // Start with false for instant UI
@@ -205,8 +212,8 @@ function CalendarPage() {
     const lastDayOfMonth = endOfMonth(currentMonth);
     const firstDayOffset = firstDayOfMonth.getDay();
 
-    const weekStart = startOfWeek(currentMonth);
-    const weekEnd = endOfWeek(currentMonth);
+    const weekStart = startOfWeek(currentMonth, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(currentMonth, { weekStartsOn: 1 });
     const daysInView = eachDayOfInterval({ 
       start: view === 'month' ? firstDayOfMonth : weekStart,
       end: view === 'month' ? lastDayOfMonth : weekEnd 
@@ -454,6 +461,17 @@ function CalendarPage() {
     }
   };
 
+  // Reset selected week day when navigating weeks
+  useEffect(() => {
+    if (view === 'week') {
+      const today = new Date();
+      const inCurrentWeek = dateInfo.daysInView.some(
+        d => format(d, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd')
+      );
+      setSelectedWeekDay(inCurrentWeek ? today : dateInfo.daysInView[0]);
+    }
+  }, [dateInfo.start, view]);
+
   // Memoize view change handler to prevent unnecessary re-renders
   const handleViewChange = useCallback((newView: 'month' | 'week') => {
     if (newView !== view) {
@@ -461,6 +479,54 @@ function CalendarPage() {
       setExpandedDates(new Set()); // Clear expanded dates when changing views
     }
   }, [view]);
+
+  const handleExportIcal = useCallback(() => {
+    const dayMap: Record<string, string> = {
+      Sunday: 'SU', Monday: 'MO', Tuesday: 'TU', Wednesday: 'WE',
+      Thursday: 'TH', Friday: 'FR', Saturday: 'SA'
+    };
+
+    const lines: string[] = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//HabitTracker//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+    ];
+
+    goals.forEach(goal => {
+      const byday = goal.frequency.map((d: string) => dayMap[d]).filter(Boolean).join(',');
+      if (!byday) return;
+      const dtstart = format(parseISO(goal.start_date), 'yyyyMMdd');
+      const until = goal.end_date ? `${format(parseISO(goal.end_date), "yyyyMMdd'T'235959Z")}` : '';
+      lines.push(
+        'BEGIN:VEVENT',
+        `UID:habit-${goal.id}@habittracker`,
+        `DTSTART;VALUE=DATE:${dtstart}`,
+        `DURATION:PT30M`,
+        `RRULE:FREQ=WEEKLY;BYDAY=${byday}${until ? `;UNTIL=${until}` : ''}`,
+        `SUMMARY:${goal.title}`,
+        'END:VEVENT'
+      );
+    });
+
+    lines.push('END:VCALENDAR');
+
+    const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'habits.ics';
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowExportDropdown(false);
+  }, [goals]);
+
+  const handleExportGoogleCalendar = useCallback(() => {
+    handleExportIcal();
+    window.open('https://calendar.google.com/calendar/r/settings/import', '_blank');
+    setShowExportDropdown(false);
+  }, [handleExportIcal]);
 
   // Show minimal loading only if no data is available at all
   if (loading && !dataLoaded && goals.length === 0) {
@@ -495,155 +561,229 @@ function CalendarPage() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col" style={{ 
-      height: '780px',
-      background: 'linear-gradient(180deg, #FF928A 0%, #0A2861 100%)',
-      backgroundImage: `url(${import.meta.env.BASE_URL}background.png), linear-gradient(180deg, #FF928A 0%, #0A2861 100%)`,
-      backgroundSize: 'cover, cover',
-      backgroundPosition: 'center, center',
-      backgroundRepeat: 'no-repeat, no-repeat'
-    }}>
-      {/* Content area - scrollable */}
-      <div className="flex-1 overflow-y-auto transition-all duration-300 ease-in-out">
+    <div className="w-full">
+      <div>
         {/* Header */}
-        <div className="flex items-center mb-6">
-          <h1 className="text-center mr-4" style={{
-            color: '#FFF',
-            textAlign: 'center',
-            fontFamily: 'Poppins',
-            fontSize: '22px',
-            fontStyle: 'normal',
-            fontWeight: 500,
-            lineHeight: '19px'
-          }}>Calendar</h1>
+        <div className="flex items-center mb-4">
+          <h1 className="text-center mr-4" style={{ color: '#FFF', fontFamily: 'Poppins', fontSize: '22px', fontWeight: 500, lineHeight: '19px' }}>Calendar</h1>
           <div className="flex-1 border-t" style={{ borderColor: 'rgba(255, 146, 138, 0.3)' }} />
         </div>
-        <div className="flex flex-col space-y-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <h1 className="text-center" style={{
-                color: '#FFF',
-                fontFamily: 'Poppins',
-                fontSize: '22px',
-                fontStyle: 'normal',
-                fontWeight: '500',
-                lineHeight: '19px'
-              }}>
-                {format(currentMonth, view === 'month' ? 'MMMM yyyy' : "'Week of' M.d.yyyy")}
-              </h1>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={handlePreviousMonth}
-                  className="p-1 hover:bg-white/5 rounded-full text-white transition-colors"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button 
-                  onClick={handleNextMonth}
-                  className="p-1 hover:bg-white/5 rounded-full text-white transition-colors"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
 
+        {/* Top control card */}
+        <div className="rounded-[40px] px-6 py-5 mb-4" style={{ background: 'rgba(37,37,34,0.55)', border: '1px solid #3b3b3b' }}>
+          <div className="flex items-center justify-between mb-3">
+            {/* Month selector */}
+            <div className="flex items-center gap-2">
+              <span style={{ fontFamily: 'Poppins', fontWeight: 400, fontSize: '17px', color: '#fff' }}>
+                {format(currentMonth, view === 'month' ? 'MMMM yyyy' : "'Week of' M.d.yyyy")}
+              </span>
+              <button onClick={handlePreviousMonth} className="text-white/70 hover:text-white transition-colors p-0.5">
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button onClick={handleNextMonth} className="text-white/70 hover:text-white transition-colors p-0.5">
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+            {/* Search */}
+            <button className="text-white/70 hover:text-white transition-colors">
+              <Search className="h-5 w-5" />
+            </button>
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+          {/* Monthly / Weekly / Export toggle */}
+          <div className="flex items-center gap-2">
+            {/* Segmented tab control */}
+            <div className="flex items-center p-[2px] rounded-[35px]" style={{ backgroundColor: '#414141' }}>
               <button
-                onClick={() => handleViewChange('month')}
-                className={`flex items-center justify-center transition-colors
-                  ${view === 'month' ? 'bg-[#3E3EF4] text-white' : 'border border-white/20 bg-black/40 text-white hover:bg-white/10'}
-                `}
-                            style={{
-                  height: '36px',
-                  padding: '0 16px',
-                  borderRadius: '35px',
-                  minWidth: '80px',
-                  color: '#FFF',
-                  fontFamily: 'Poppins',
-                  fontSize: '14.944px',
-                  fontStyle: 'normal',
-                  fontWeight: '500',
-                  lineHeight: '25.493px',
-                  letterSpacing: '-0.448px'
-                }}
+                onClick={() => { handleViewChange('month'); setShowExportDropdown(false); }}
+                className="flex items-center justify-center transition-colors text-white"
+                style={{ height: '28px', padding: '0 18px', borderRadius: '26px', fontFamily: 'Poppins', fontSize: '14px', fontWeight: '500', backgroundColor: view === 'month' ? '#3E3EF4' : '#252722' }}
               >
                 Monthly
               </button>
               <button
-                onClick={() => handleViewChange('week')}
-                className={`flex items-center justify-center transition-colors
-                  ${view === 'week' ? 'bg-[#3E3EF4] text-white' : 'border border-white/20 bg-black/40 text-white hover:bg-white/10'}
-                `}
-                style={{
-                  height: '36px',
-                  padding: '0 16px',
-                  borderRadius: '35px',
-                  minWidth: '80px',
-                  color: '#FFF',
-                  fontFamily: 'Poppins',
-                  fontSize: '14.944px',
-                  fontStyle: 'normal',
-                  fontWeight: '500',
-                  lineHeight: '25.493px',
-                  letterSpacing: '-0.448px'
-                }}
+                onClick={() => { handleViewChange('week'); setShowExportDropdown(false); }}
+                className="flex items-center justify-center transition-colors text-white"
+                style={{ height: '28px', padding: '0 18px', borderRadius: '26px', fontFamily: 'Poppins', fontSize: '14px', fontWeight: '500', backgroundColor: view === 'week' ? '#3E3EF4' : '#252722' }}
               >
                 Weekly
               </button>
             </div>
-            <button
-              onClick={() => setShowExportDropdown(!showExportDropdown)}
-              className="flex items-center justify-center transition-colors border border-white/20 bg-black/40 text-white hover:bg-white/10"
-                            style={{
-                  height: '36px',
-                  padding: '0 16px',
-                  borderRadius: '35px',
-                  minWidth: '80px',
-                  color: '#FFF',
-                  fontFamily: 'Poppins',
-                  fontSize: '14.944px',
-                  fontStyle: 'normal',
-                  fontWeight: '500',
-                  lineHeight: '25.493px',
-                  letterSpacing: '-0.448px'
-                }}
-            >
-              Export
-            </button>
-          </div>
-        </div>
-        <div className="rounded-xl">
-          <div className="p-2 md:p-6">
-            <div className="grid grid-cols-7 mb-1 md:mb-4">
-              {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day) => (
-                <div key={day} className="text-center text-xs md:text-sm font-medium text-gray-400 py-1">
-                  {day}
+            <div className="relative export-dropdown ml-auto">
+              <button
+                onClick={() => setShowExportDropdown(!showExportDropdown)}
+                className={`flex items-center justify-center transition-colors text-white ${showExportDropdown ? 'bg-[#3E3EF4]' : 'bg-[#252722] hover:bg-white/10'}`}
+                style={{ height: '31px', padding: '0 16px', borderRadius: '26px', fontFamily: 'Poppins', fontSize: '14px', fontWeight: '500', letterSpacing: '-0.42px', border: '2px solid #414141' }}
+              >
+                Export
+              </button>
+              {showExportDropdown && (
+                <div className="absolute right-0 mt-2 w-48 rounded-xl overflow-hidden z-50"
+                  style={{ background: 'rgba(5,8,20,0.97)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)' }}
+                >
+                  <button onClick={handleExportIcal} className="w-full flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 transition-colors text-left" style={{ fontFamily: 'Poppins', fontSize: '14px', fontWeight: '500' }}>
+                    <span>🗓</span> iCal
+                  </button>
+                  <div style={{ height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+                  <button onClick={handleExportGoogleCalendar} className="w-full flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 transition-colors text-left" style={{ fontFamily: 'Poppins', fontSize: '14px', fontWeight: '500' }}>
+                    <span>📅</span> Google Calendar
+                  </button>
                 </div>
-              ))}
-            </div>
-            <div className={`grid grid-cols-7 gap-0.5 md:gap-2 ${view === 'week' ? 'h-[600px]' : 'min-h-[400px]'}`}>
-              {view === 'month' && Array.from({ length: dateInfo.firstDayOffset }).map((_, i) => (
-                <div key={`empty-${i}`} className="md:aspect-square" />
-              ))}
-              {dateInfo.daysInView.map((date) => (
-                <DayCell
-                  key={format(date, 'yyyy-MM-dd')}
-                  date={date}
-                  goals={goals}
-                  completions={completions}
-                  misses={misses}
-                  view={view}
-                  selectedDate={selectedDate}
-                  expandedDates={expandedDates}
-                  onGoalAction={handleGoalAction}
-                  onToggleExpansion={toggleDateExpansion}
-                />
-              ))}
+              )}
             </div>
           </div>
         </div>
+
+        {/* Calendar grid */}
+        {view === 'month' ? (
+          <div className="rounded-[24px] px-5 py-6" style={{ background: 'rgba(55,55,55,0.43)', border: '1px solid #0a2861' }}>
+            {/* Weekday headers */}
+            <div className="grid grid-cols-7 mb-4">
+              {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((day) => (
+                <div key={day} className="text-center text-white font-medium" style={{ fontFamily: 'Poppins', fontSize: '14.6px' }}>{day}</div>
+              ))}
+            </div>
+            {/* Day number grid */}
+            <div className="grid grid-cols-7 gap-y-3">
+              {Array.from({ length: dateInfo.firstDayOffset }).map((_, i) => (
+                <div key={`empty-${i}`} />
+              ))}
+              {dateInfo.daysInView.map((date) => {
+                const isToday = isDateToday(date);
+                const dateStr = format(date, 'yyyy-MM-dd');
+                const dayGoals = [...STATIC_GOALS, ...goals].filter(goal => {
+                  const dayOfWeek = format(date, 'EEEE');
+                  const startDate = parseISO(goal.start_date);
+                  const endDate = goal.end_date ? parseISO(goal.end_date) : null;
+                  return !isBefore(date, startDate) && (endDate ? !isAfter(date, endDate) : true) && goal.frequency.includes(dayOfWeek);
+                });
+                const hasCompletion = completions.some(c => dayGoals.some(g => g.id === c.goal_id) && c.completed_date === dateStr);
+                const hasMiss = misses.some(m => dayGoals.some(g => g.id === m.goal_id) && m.missed_date === dateStr);
+                return (
+                  <div key={dateStr} className="flex flex-col items-center gap-0.5">
+                    <span
+                      className={`flex items-center justify-center rounded-full font-medium transition-colors ${isToday ? 'bg-white text-[#0d0d0d]' : 'text-white hover:bg-white/10'}`}
+                      style={{ width: '34px', height: '34px', fontFamily: 'Poppins', fontSize: '14.6px' }}
+                    >
+                      {format(date, 'd')}
+                    </span>
+                    {dayGoals.length > 0 && (
+                      <div className="flex" style={{ gap: '-2px', marginTop: '3px' }}>
+                        {dayGoals.slice(0, 3).map((g, i) => (
+                          <span key={g.id} className="rounded-full" style={{ width: '3px', height: '3px', backgroundColor: hasCompletion ? '#4ade80' : hasMiss ? '#f87171' : g.color || '#ffffff60', marginLeft: i > 0 ? '-1px' : 0, flexShrink: 0 }} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <div>
+            {/* Day picker strip */}
+            <div className="flex gap-1 mb-4">
+              {dateInfo.daysInView.map((date) => {
+                const isToday = isDateToday(date);
+                const isSelected = format(date, 'yyyy-MM-dd') === format(selectedWeekDay, 'yyyy-MM-dd');
+                return (
+                  <button
+                    key={format(date, 'yyyy-MM-dd')}
+                    onClick={() => setSelectedWeekDay(date)}
+                    className={`flex-1 flex flex-col items-center py-2 rounded-xl transition-all ${
+                      isSelected ? 'bg-[#3E3EF4]' : 'hover:bg-white/5'
+                    }`}
+                  >
+                    <span className="text-xs font-medium" style={{ color: isSelected ? '#fff' : 'rgba(255,255,255,0.55)', fontFamily: 'Poppins' }}>
+                      {format(date, 'EEE').slice(0, 2)}
+                    </span>
+                    <span
+                      className={`text-sm font-medium mt-1 w-7 h-7 flex items-center justify-center rounded-full ${
+                        isToday && !isSelected ? 'bg-white text-[#0d0d0d]' : 'text-white'
+                      }`}
+                      style={{ fontFamily: 'Poppins' }}
+                    >
+                      {format(date, 'd')}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Selected day goals */}
+            <div className="rounded-[24px] px-4 py-4" style={{ background: 'rgba(55,55,55,0.43)', border: '1px solid #3b3b3b' }}>
+              <p className="text-white/50 text-xs mb-3" style={{ fontFamily: 'Poppins' }}>
+                {format(selectedWeekDay, 'EEEE, MMMM d')}
+              </p>
+              {(() => {
+                const dateStr = format(selectedWeekDay, 'yyyy-MM-dd');
+                const dayOfWeek = format(selectedWeekDay, 'EEEE');
+                const allGoals = [...STATIC_GOALS, ...goals];
+                const dayGoals = allGoals.filter(goal => {
+                  const startDate = parseISO(goal.start_date);
+                  const endDate = goal.end_date ? parseISO(goal.end_date) : null;
+                  return !isBefore(selectedWeekDay, startDate) &&
+                    (endDate ? !isAfter(selectedWeekDay, endDate) : true) &&
+                    goal.frequency.includes(dayOfWeek);
+                });
+
+                if (dayGoals.length === 0) {
+                  return (
+                    <p className="text-white/30 text-sm text-center py-8" style={{ fontFamily: 'Poppins' }}>
+                      No goals scheduled
+                    </p>
+                  );
+                }
+
+                return (
+                  <div className="space-y-2">
+                    {dayGoals.map(goal => {
+                      const isCompleted = completions.some(c => c.goal_id === goal.id && c.completed_date === dateStr);
+                      const isMissed = misses.some(m => m.goal_id === goal.id && m.missed_date === dateStr);
+                      return (
+                        <div
+                          key={goal.id}
+                          className={`flex items-center justify-between p-3 rounded-xl ${
+                            isCompleted ? 'bg-green-500/10' : isMissed ? 'bg-red-500/10' : 'bg-white/5'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="w-2.5 h-2.5 flex-shrink-0 rounded-full" style={{ backgroundColor: goal.color }} />
+                            <span
+                              className={`text-sm font-medium truncate ${isCompleted ? 'text-green-400' : isMissed ? 'text-red-400' : 'text-white'}`}
+                              style={{ fontFamily: 'Poppins' }}
+                            >
+                              {goal.title}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                            {isCompleted && <CheckCircle2 className="h-4 w-4 text-green-400" />}
+                            {isMissed && <XCircle className="h-4 w-4 text-red-400" />}
+                            {!isCompleted && !isMissed && (
+                              <>
+                                <button
+                                  onClick={() => handleGoalAction(goal.id, dateStr, 'complete')}
+                                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                                >
+                                  <CheckCircle2 className="h-4 w-4 text-gray-400 hover:text-green-400" />
+                                </button>
+                                <button
+                                  onClick={() => handleGoalAction(goal.id, dateStr, 'miss')}
+                                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                                >
+                                  <XCircle className="h-4 w-4 text-gray-400 hover:text-red-400" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
 
         {showMissForm && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">

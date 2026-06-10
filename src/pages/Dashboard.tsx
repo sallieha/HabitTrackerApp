@@ -238,30 +238,21 @@ function Dashboard() {
   const daysInMonth = lastDayOfMonth.getDate();
 
   return (
-    <div className="w-full h-full flex flex-col" style={{ 
-      height: '780px',
-      background: 'linear-gradient(180deg, #FF928A 0%, #0A2861 100%)',
-      backgroundImage: `url(${import.meta.env.BASE_URL}background.png), linear-gradient(180deg, #FF928A 0%, #0A2861 100%)`,
-      backgroundSize: 'cover, cover',
-      backgroundPosition: 'center, center',
-      backgroundRepeat: 'no-repeat, no-repeat'
-    }}>
-      {/* Header */}
-      <div className="flex items-center mb-6">
-        <h1 className="text-center mr-4" style={{
-          color: '#FFF',
-          textAlign: 'center',
-          fontFamily: 'Poppins',
-          fontSize: '22px',
-          fontStyle: 'normal',
-          fontWeight: 500,
-          lineHeight: '19px'
-        }}>Dashboard</h1>
-        <div className="flex-1 border-t" style={{ borderColor: 'rgba(255, 146, 138, 0.3)' }} />
-      </div>
+    <div className="w-full">
+        {/* Header */}
+        <div className="flex items-center mb-6">
+          <h1 className="text-center mr-4" style={{
+            color: '#FFF',
+            textAlign: 'center',
+            fontFamily: 'Poppins',
+            fontSize: '22px',
+            fontStyle: 'normal',
+            fontWeight: 500,
+            lineHeight: '19px'
+          }}>Dashboard</h1>
+          <div className="flex-1 border-t" style={{ borderColor: 'rgba(255, 146, 138, 0.3)' }} />
+        </div>
 
-      {/* Content area - scrollable */}
-      <div className="flex-1 overflow-y-auto">
         {/* Overall Activity Widget */}
         <div className="bg-gradient-to-br from-[#23243A]/75 to-[#2B2250]/75 rounded-3xl p-6 mb-8 relative overflow-hidden border border-white/10" style={{ minHeight: 370 }}>
           <div className="text-white text-lg font-semibold mb-2" style={{ fontFamily: 'Poppins', fontWeight: 500 }}>Overall Activity</div>
@@ -588,7 +579,7 @@ function Dashboard() {
             }}>My Goals</h2>
           </div>
           
-          <div className="flex gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent pb-4">
+          <div className="flex gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent pb-4 w-[calc(100%+2rem)] -mr-8">
             {/* First Card - Blue */}
             <div className="relative flex flex-col min-w-[220px] min-h-[220px] w-[220px] h-[220px] px-6 py-6 transition-all cursor-pointer bg-[#3E3EF4] rounded-3xl">
               <div className="absolute top-4 right-4">
@@ -769,7 +760,6 @@ function Dashboard() {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 }

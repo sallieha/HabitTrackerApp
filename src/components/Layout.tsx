@@ -100,7 +100,7 @@ function Layout() {
       {/* Main content - scrollable */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden w-full">
         <main className="p-4 w-full">
-          <div className="rounded-xl border border-white/10 p-4 w-full">
+          <div className="rounded-xl p-4 w-full">
             <Outlet />
           </div>
         </main>

@@ -228,14 +228,7 @@ function AIChat() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col" style={{
-      height: '780px',
-      backgroundColor: '#0A2861',
-      backgroundImage: `url(${import.meta.env.BASE_URL}background.png), linear-gradient(180deg, #FF928A 0%, #0A2861 100%)`,
-      backgroundSize: 'cover, cover',
-      backgroundPosition: 'center, center',
-      backgroundRepeat: 'no-repeat, no-repeat'
-    }}>
+    <div className="w-full flex flex-col" style={{ minHeight: '600px' }}>
       {/* Content area - scrollable */}
       <div className="flex-1 overflow-y-auto">
         {/* Initial AI message - always shown at top */}
