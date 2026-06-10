@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { useNavigate } from 'react-router-dom';
-import { testConnection } from '../lib/supabase';
 
 function Login() {
   const [name, setName] = useState('');
@@ -19,19 +18,7 @@ function Login() {
     setIsLoading(true);
 
     try {
-      // Test connection first
-      console.log('Testing Supabase connection...');
-      const isConnected = await testConnection();
-      
-      if (!isConnected) {
-        setError('Unable to connect to authentication service. Please check your internet connection.');
-        setIsLoading(false);
-        return;
-      }
-
-      console.log('Attempting to sign in with:', { email, password: '***' });
       await signIn(email, password);
-      console.log('Sign in successful, navigating to AI Chat...');
       navigate('/ai-chat');
     } catch (err: unknown) {
       console.error('Login error:', err);
@@ -43,14 +30,14 @@ function Login() {
   };
 
   return (
-    <div className="w-full flex flex-col" style={{ 
-      background: 'linear-gradient(180deg, #FF928A 0%, #0A2861 100%)',
+    <div className="w-full flex flex-col" style={{
       backgroundImage: `url(${import.meta.env.BASE_URL}background.png), linear-gradient(180deg, #FF928A 0%, #0A2861 100%)`,
       backgroundSize: 'cover, cover',
       backgroundPosition: 'center, center',
       backgroundRepeat: 'no-repeat, no-repeat',
-      height: '780px', 
-      minHeight: '780px' 
+      backgroundColor: '#0A2861',
+      height: '780px',
+      minHeight: '780px'
     }}>
       {/* Content area - scrollable */}
       <div className="flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8" style={{ paddingTop: '128px', paddingBottom: '48px' }}>
@@ -77,13 +64,12 @@ function Login() {
               autoComplete="name"
             />
             <input
-              type="email"
+              type="text"
               placeholder="Niko@gmail.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               className="w-4/5 rounded-full bg-white/10 text-white placeholder-white/70 px-6 py-3 outline-none border-none text-base font-semibold shadow-sm focus:ring-2 focus:ring-indigo-400 text-center"
               autoComplete="email"
-              required
             />
             <input
               type="password"
@@ -92,7 +78,6 @@ function Login() {
               onChange={e => setPassword(e.target.value)}
               className="w-4/5 rounded-full bg-white/10 text-white placeholder-white/70 px-6 py-3 outline-none border-none text-base font-semibold shadow-sm focus:ring-2 focus:ring-indigo-400 text-center"
               autoComplete="current-password"
-              required
             />
             <button
               type="submit"
