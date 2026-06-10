@@ -19,6 +19,7 @@ body {
   font-weight: 300;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  background-color: #000;
 }
 
 #root {
