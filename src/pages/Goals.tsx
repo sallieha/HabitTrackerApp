@@ -108,8 +108,8 @@ function Goals() {
             <div className="relative flex flex-col px-6 py-6 transition-all bg-[#3E3EF4] shadow-2xl rounded-[32px]">
               {/* Avatars */}
               <div className="flex items-center space-x-[-12px] mb-2">
-                <img src="/Frame 25.svg" alt="avatar1" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 10 }} />
-                <img src="/Frame 27.svg" alt="avatar2" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 9 }} />
+                <img src={`${import.meta.env.BASE_URL}Frame 25.svg`} alt="avatar1" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 10 }} />
+                <img src={`${import.meta.env.BASE_URL}Frame 27.svg`} alt="avatar2" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 9 }} />
               </div>
               {/* Arrow / Collapse icon */}
               <div className="absolute top-4 right-4">
@@ -154,9 +154,9 @@ function Goals() {
             {/* Chats - Grey card */}
             <div className="relative flex flex-col px-6 py-6 transition-all bg-[#232323] rounded-[32px] mt-2">
               <div className="flex items-center space-x-[-12px] mb-2">
-                <img src="/Ellipse 1080.svg" alt="avatar1" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 10 }} />
-                <img src="/Frame 28.svg" alt="avatar2" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 9 }} />
-                <img src="/Frame 27.svg" alt="avatar3" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 8 }} />
+                <img src={`${import.meta.env.BASE_URL}Ellipse 1080.svg`} alt="avatar1" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 10 }} />
+                <img src={`${import.meta.env.BASE_URL}Frame 28.svg`} alt="avatar2" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 9 }} />
+                <img src={`${import.meta.env.BASE_URL}Frame 27.svg`} alt="avatar3" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 8 }} />
               </div>
               <div className="absolute top-4 right-4">
                 <button onClick={() => toggleCard('chats')} className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-white/30 bg-[#232323] text-white/80">
@@ -198,7 +198,7 @@ function Goals() {
             {/* Prep - Grey card */}
             <div className="relative flex flex-col px-6 py-6 transition-all bg-[#232323] rounded-[32px] mt-2">
               <div className="flex items-center space-x-[-12px] mb-2">
-                <img src="/Frame 28.svg" alt="avatar1" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 10 }} />
+                <img src={`${import.meta.env.BASE_URL}Frame 28.svg`} alt="avatar1" className="w-8 h-8 rounded-full border-2 border-white object-cover" style={{ zIndex: 10 }} />
               </div>
               <div className="absolute top-4 right-4">
                 <button onClick={() => toggleCard('prep')} className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-white/30 bg-[#232323] text-white/80">

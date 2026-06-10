@@ -592,13 +592,13 @@ function Dashboard() {
               {/* Avatars */}
               <div className="flex items-center space-x-[-12px] mb-[50px]">
                 <img
-                  src="/Frame 25.svg"
+                  src={`${import.meta.env.BASE_URL}Frame 25.svg`}
                   alt="avatar1"
                   className="w-8 h-8 rounded-full border-2 border-white object-cover z-10"
                   style={{ zIndex: 10 }}
                 />
                 <img
-                  src="/Frame 26.svg"
+                  src={`${import.meta.env.BASE_URL}Frame 26.svg`}
                   alt="avatar2"
                   className="w-8 h-8 rounded-full border-2 border-white object-cover z-10"
                   style={{ zIndex: 9 }}
@@ -639,13 +639,13 @@ function Dashboard() {
               {/* Avatars */}
               <div className="flex items-center space-x-[-12px] mb-[50px]">
                 <img
-                  src="/Ellipse 1080.svg"
+                  src={`${import.meta.env.BASE_URL}Ellipse 1080.svg`}
                   alt="avatar1"
                   className="w-8 h-8 rounded-full border-2 border-white object-cover z-10"
                   style={{ zIndex: 10 }}
                 />
                 <img
-                  src="/Frame 28.svg"
+                  src={`${import.meta.env.BASE_URL}Frame 28.svg`}
                   alt="avatar2"
                   className="w-8 h-8 rounded-full border-2 border-white object-cover z-10"
                   style={{ zIndex: 9 }}
@@ -686,7 +686,7 @@ function Dashboard() {
               {/* Avatars */}
               <div className="flex items-center space-x-[-12px] mb-[50px]">
                 <img
-                  src="/Frame 28.svg"
+                  src={`${import.meta.env.BASE_URL}Frame 28.svg`}
                   alt="avatar1"
                   className="w-8 h-8 rounded-full border-2 border-white object-cover z-10"
                   style={{ zIndex: 10 }}
